@@ -388,11 +388,18 @@ extern NSString* const GCDWebServerAuthenticationMethod_DigestAccess;
 @interface GCDWebServer (Extensions)
 
 /**
- *  Returns the server's URL.
+ *  Returns the server's WIFI URL.
  *
  *  @warning This property is only valid if the server is running.
  */
 @property(nonatomic, readonly, nullable) NSURL* serverURL;
+
+/**
+ *  Returns the server's Ethernet URL.
+ *
+ *  @warning This property is only valid if the server is running.
+ */
+@property(nonatomic, readonly, nullable) NSURL* serverSecondaryURL;
 
 /**
  *  Returns the server's Bonjour URL.

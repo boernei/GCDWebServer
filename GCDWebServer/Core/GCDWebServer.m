@@ -629,7 +629,7 @@ static inline NSString* _EncodeBase64(NSString* string) {
 
   dispatch_resume(_source4);
   dispatch_resume(_source6);
-  GWS_LOG_INFO(@"%@ started on port %i and reachable at %@", [self class], (int)_port, self.serverURL);
+  GWS_LOG_INFO(@"%@ started on port %i and reachable at %@ and %@", [self class], (int)_port, self.serverURL,self.serverSecondaryURL);
   if ([_delegate respondsToSelector:@selector(webServerDidStart:)]) {
     dispatch_async(dispatch_get_main_queue(), ^{
       [self->_delegate webServerDidStart:self];
@@ -793,6 +793,21 @@ static inline NSString* _EncodeBase64(NSString* string) {
   }
   return nil;
 }
+
+- (NSURL*)serverSecondaryURL {
+  if (_source4) {
+    NSString* ipAddress = _bindToLocalhost ? @"localhost" : GCDWebServerGetSecondaryIPAddress(NO);  // We can't really use IPv6 anyway as it doesn't work great with HTTP URLs in practice
+    if (ipAddress) {
+      if (_port != 80) {
+        return [NSURL URLWithString:[NSString stringWithFormat:@"http://%@:%i/", ipAddress, (int)_port]];
+      } else {
+        return [NSURL URLWithString:[NSString stringWithFormat:@"http://%@/", ipAddress]];
+      }
+    }
+  }
+  return nil;
+}
+
 
 - (NSURL*)bonjourServerURL {
   if (_source4 && _resolutionService) {

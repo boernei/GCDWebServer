@@ -70,6 +70,16 @@ NSDictionary<NSString*, NSString*>* GCDWebServerParseURLEncodedForm(NSString* fo
  *  interface if connected or nil otherwise.
  */
 NSString* _Nullable GCDWebServerGetPrimaryIPAddress(BOOL useIPv6);
+  
+/**
+  *  On OS X, returns the IPv4 or IPv6 address as a string of the primary
+  *  connected service or nil if not available.
+  *
+  *  On iOS, returns the IPv4 or IPv6 address as a string of the Ethernet
+  *  interface if connected or nil otherwise.
+  */
+NSString* _Nullable GCDWebServerGetSecondaryIPAddress(BOOL useIPv6);
+
 
 /**
  *  Converts a date into a string using RFC822 formatting.

@@ -296,6 +296,37 @@ NSString* GCDWebServerGetPrimaryIPAddress(BOOL useIPv6) {
   return address;
 }
 
+NSString* GCDWebServerGetSecondaryIPAddress(BOOL useIPv6) {
+  NSString* address = nil;
+#if TARGET_OS_IPHONE
+#if !TARGET_IPHONE_SIMULATOR && !TARGET_OS_TV
+  const char* primaryInterface = "en3";  // Ethernet interface on iOS
+#endif
+#endif
+  
+  struct ifaddrs* list;
+  if (getifaddrs(&list) >= 0) {
+    for (struct ifaddrs* ifap = list; ifap; ifap = ifap->ifa_next) {
+#if TARGET_IPHONE_SIMULATOR || TARGET_OS_TV
+      // Assume en0 is Ethernet and en1 is WiFi since there is no way to use SystemConfiguration framework in iOS Simulator
+      // Assumption holds for Apple TV running tvOS
+      if (strcmp(ifap->ifa_name, "en0") && strcmp(ifap->ifa_name, "en1"))
+#else
+        if (strcmp(ifap->ifa_name, primaryInterface))
+#endif
+        {
+          continue;
+        }
+      if ((ifap->ifa_flags & IFF_UP) && ((!useIPv6 && (ifap->ifa_addr->sa_family == AF_INET)) || (useIPv6 && (ifap->ifa_addr->sa_family == AF_INET6)))) {
+        address = GCDWebServerStringFromSockAddr(ifap->ifa_addr, NO);
+        break;
+      }
+    }
+    freeifaddrs(list);
+  }
+  return address;
+}
+
 NSString* GCDWebServerComputeMD5Digest(NSString* format, ...) {
   va_list arguments;
   va_start(arguments, format);
